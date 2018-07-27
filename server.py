@@ -1,10 +1,9 @@
 from bottle import route, run
 from bottle import post, get, put, delete
 from bottle import response, request
-
+import requests
 from json import dumps, loads
-impotr json
-import pusher
+import json
 
 
 group_id=""
@@ -25,21 +24,14 @@ def images():
 @post('/token')
 def token():
     value = request.body.read()
+    print value
     v = loads(value)
     instagram_user_urls = read_instagram_feed(v['user_id'],v['access_token'])
     group_id = v['group_id']
+    response.status = 200
 
-
-
-def pusher():
-    usher_client = pusher.Pusher(
-    app_id='562354',
-    key='472deb41d62feac32b9b',
-    secret='d804a3b8190eb2145459',
-    cluster='us2',
-    ssl=True
-    )
-    pusher_client.trigger('username', 'appendEntryEvent', {'url': 'http://foo.com/bar.jpg', ‘description’: ‘foo’, ‘location’: ‘bar’})
+    retry =  gopis_method(instagram_user_urls)
+    return {"result": retry}
 
 
 def read_instagram_feed(user_id,access_token):
@@ -52,8 +44,8 @@ def read_instagram_feed(user_id,access_token):
     responseBody["urls"] = []
     for post in resp["data"]:
         responseBody["urls"].append(post["images"]["standard_resolution"]["url"])
-    print "----------"
-    print responseBody
+    # print "----------"
+    # print responseBody
     return responseBody["urls"]
 
 def gopis_method(instagram_urls):
@@ -68,6 +60,7 @@ def gopis_method(instagram_urls):
         "tags":["adventure" , "music" , "food"]
     }
     ]
+    return result
 
 
-run(host='172.30.0.165', port=8089, debug=True)
+run(host='localhost', port=8080, debug=True)
