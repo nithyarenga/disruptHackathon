@@ -8,7 +8,7 @@ import pusher
 import threading
 import time
 
-
+#ids
 group_id=""
 user_id="siddhukrs"
 
