@@ -4,9 +4,11 @@ from bottle import response, request
 import requests
 from json import dumps, loads
 import json
+import pusher
 
 
 group_id=""
+user_id=""
 
 @get('/hello')
 def hello():
@@ -26,6 +28,7 @@ def token():
     value = request.body.read()
     print value
     v = loads(value)
+    user_id=v['user_id']
     instagram_user_urls = read_instagram_feed(v['user_id'],v['access_token'])
     group_id = v['group_id']
     response.status = 200
@@ -33,6 +36,16 @@ def token():
     retry =  gopis_method(instagram_user_urls)
     return {"result": retry}
 
+def pusher(urls):
+    pusher_client = pusher.Pusher(
+        app_id='562354',
+        key='472deb41d62feac32b9b',
+        secret='d804a3b8190eb2145459',
+        cluster='us2',
+        ssl=True
+    )
+    for url in urls:
+        pusher_client.trigger(user_id,'prependEntryEvent',url)
 
 def read_instagram_feed(user_id,access_token):
     url="https://api.instagram.com/v1/users/self/media/recent/?access_token="+access_token+"&count=20"
