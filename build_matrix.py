@@ -7,7 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import RidgeClassifierCV
 from sklearn.model_selection import cross_val_score
 import rest_calls
-import instagram_data
+# import instagram_data
 
 
 def build_all_rows(combined_scores, reqd_cols):
@@ -109,5 +109,5 @@ if __name__ == "__main__":
         build_matrix_df(flickr_results_file)
         raw_input('Check')
     predict_instagram = True
-    if predict_instagram:
-        print(run_instagram_model(instagram_data.instagram_package['group_id'], instagram_data.instagram_package['urls']))
+    # if predict_instagram:
+    #     print(run_instagram_model(instagram_data.instagram_package['group_id'], instagram_data.instagram_package['urls']))

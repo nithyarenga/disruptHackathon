@@ -69,7 +69,7 @@ class RequestAPI(object):
         hash_filename = "{}.pickle".format(hashlib.sha224(reqd_url).hexdigest())
         file_path = os.path.join(self.file_directory, hash_filename)
         if os.path.isfile(file_path):
-            print("Loading Cache")
+            #print("Loading Cache")
             reqd_data = pickle.load(open(file_path))
         else:
             reqd_data = self.handle_api(url, params)
@@ -77,7 +77,7 @@ class RequestAPI(object):
                 reqd_data = {}
             else:
                 pickle.dump(reqd_data, open(file_path, 'w+'))
-                print('Data Cached')
+                #print('Data Cached')
         return reqd_data
 
     def create_url(self, url, param):
@@ -86,8 +86,8 @@ class RequestAPI(object):
 
     def handle_api(self, base_url, params):
         response = requests.get(base_url, params=params)
-        print('Status of the Call', rest_errors[response.status_code])
-        print('URL', response.url)
+        #print('Status of the Call', rest_errors[response.status_code])
+        #print('URL', response.url)
         return response
 
 
@@ -105,7 +105,7 @@ def parse_flikr_json(json_data):
 
 class ManageCacheFolder(object):
     def __init__(self, process_tag):
-        print("Manage The folders for caching")
+        #print("Manage The folders for caching")
         self.cache_folder = './cache/'
         self.cache_format = '{}_pickle'.format(process_tag)
         if not os.path.isdir(self.cache_folder):
@@ -137,7 +137,7 @@ class ManageCacheFolder(object):
 
 class ClarifiaImageAnalysis(object):
     def __init__(self, group_id):
-        print("setting up Clarifia image analysis")
+        #print("setting up Clarifia image analysis")
         self.app = ClarifaiApp(api_key=clarifia_apikey)
         self.travel_model = self.app.models.get('travel-v1.0')
         self.general_model = self.app.models.get('general-v1.3')
@@ -145,23 +145,33 @@ class ClarifiaImageAnalysis(object):
 
     def predict_image(self, url, cache_folder, cache_filename):
         multiple_response = {}
-        multiple_response['general'] = self.general_model.predict_by_url(url=url)
-        status_general = multiple_response['general']['status']['description']
-        multiple_response['travel'] = self.travel_model.predict_by_url(url=url)
-        status_travel = multiple_response['travel']['status']['description']
-        print(status_general, status_travel)
+        try:
+            multiple_response['general'] = self.general_model.predict_by_url(url=url)
+            status_general = multiple_response['general']['status']['description']
+        except:
+            multiple_response['general'] = {}
+            status_general = 'Error'
+        
+        try:
+            multiple_response['travel'] = self.travel_model.predict_by_url(url=url)
+            status_travel = multiple_response['travel']['status']['description']
+        except:
+            multiple_response['travel'] = {}
+            status_travel = 'Error'
+        
+        #print(status_general, status_travel)
         if status_general == 'Ok' and status_travel == 'Ok':
-            print('Image url {} Passed'.format(url))
+            #print('Image url {} Passed'.format(url))
             pickle.dump(multiple_response, open(os.path.join(cache_folder, cache_filename), 'w+'))
         else:
             print('Clarifia Failed for image url {}! Check System, Gopi'.format(url))
-            raw_input('Wait Here got Gopi')
-        print('Response Cached for url {}'.format(url))
+            #raw_input('Wait Here got Gopi')
+        #print('Response Cached for url {}'.format(url))
         return multiple_response
 
     def image_response(self, url):
         hash_status, hash_filename = self.manage_files._check_url_status(url)
-        print('Image Response', hash_status, hash_filename)
+        #print('Image Response', hash_status, hash_filename)
         if hash_status:
             reqd_data = pickle.load(open(os.path.join(self.manage_files.cache_folder, hash_filename)))
         else:
@@ -169,8 +179,10 @@ class ClarifiaImageAnalysis(object):
         return hash_filename, reqd_data
 
     def analyze_response(self, response_data):
-        reqd_concepts = {}
+        reqd_concepts = {'travel': {}, 'general': {}}
         for ind_model in ['travel', 'general']:
+            if response_data[ind_model] == {}:
+                continue
             for ind_output in response_data[ind_model]['outputs']:
                 for concept_val in ind_output['data']['concepts']:
                     if concept_val['value'] > 0.3:
@@ -182,16 +194,18 @@ class ClarifiaImageAnalysis(object):
         for ind_image_url in urls:
             filename, response_data = self.image_response(ind_image_url)
             reqd_response = self.analyze_response(response_data)
-            all_image_results.setdefault(filename, reqd_response)
+            if reqd_response != {'travel'}:
+                all_image_results.setdefault(filename, reqd_response)
         return all_image_results
 
 
 def flickr_image_analysis(all_tags, search_params):
+    all_results = dict()
     api_details = RequestAPI()
     clarafia = ClarifiaImageAnalysis('flickr')
-    all_results = dict()
+    
     for ind_tag in all_tags:
-        print ("Currently processing {} tags".format(ind_tag))
+        #print ("Currently processing {} tags".format(ind_tag))
         reqd_params = deepcopy(search_params)
         reqd_params['img_search_params']['tags'] = ind_tag
         reqd_links = api_details.complete_response(reqd_params['base_url'], reqd_params['img_search_params'])
