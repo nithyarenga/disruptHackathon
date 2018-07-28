@@ -35,10 +35,7 @@ def token():
     user_id=v['user_id']
     group_id = v['group_id']
     response.status = 200
-    #print  instagram_user_urls
-    #url_list = {"key":instagram_user_urls}
     thr = threading.Thread(target=gopis_method, args=(v['user_id'],v['access_token']), kwargs={})
-    #retry =  gopis_method(instagram_user_urls)
     thr.start()
     return {"result": 200}
 
@@ -55,11 +52,15 @@ def reco():
         "description":["hills" , "music" , "culture"]
     }
     ]
+
+    # pkl_file = open('myfile.pkl', 'rb')
+    # result = pickle.load(pkl_file)
+    # pkl_file.close()
+    
     push_sid(result)
     response.status = 200
     return {"result": 200}
-
-
+    
 
 def push_sid(urls):
     pusher_client = pusher.Pusher(
@@ -88,9 +89,18 @@ def read_instagram_feed(user_id,access_token):
 
 def gopis_method(user_id, access_token):
     
+    # pkl_file = open('myfile.pkl', 'rb')
+    # old_reco = pickle.load(pkl_file)
+
     # instagram_urls = read_instagram_feed(user_id, access_token)
-    # reco_result=build_matrix.run_instagram_model("sid", instagram_urls)
-    # print reco_result
+    # new_reco=build_matrix.run_instagram_model(group_id, instagram_urls)
+    # print new_reco
+    # old_reco.append(new_reco)
+    # pkl_file = open('myfile.pkl', 'wb')
+    # mydict2 = pickle.dump(pkl_file)
+    # push_sid(mydict2)
+
+    
     result = [{
         "url": "https://scontent.cdninstagram.com/vp/87c04d0814eb22217015f5d4757c5aeb/5C0D0AF2/t51.2885-15/sh0.08/e35/s640x640/37254209_2119495828322471_6795489576329674752_n.jpg?_nc_eui2=AeGwhmWbrK2upocXw-fitQ_XtU8urjdHJuMnzfaBnVJtH1BjmaHwo-8MG0W6gYuTM0xjfzRLQYNhSdmC_aJbxIbv",
         "location": "Austin",
