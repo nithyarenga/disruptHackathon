@@ -88,20 +88,20 @@ def read_instagram_feed(user_id,access_token):
 
 def gopis_method(user_id, access_token):
     
-    instagram_urls = read_instagram_feed(user_id, access_token)
-    reco_result=build_matrix.run_instagram_model("sid", instagram_urls)
-    print reco_result
-    # result = [{
-    #     "url": "https://scontent.cdninstagram.com/vp/87c04d0814eb22217015f5d4757c5aeb/5C0D0AF2/t51.2885-15/sh0.08/e35/s640x640/37254209_2119495828322471_6795489576329674752_n.jpg?_nc_eui2=AeGwhmWbrK2upocXw-fitQ_XtU8urjdHJuMnzfaBnVJtH1BjmaHwo-8MG0W6gYuTM0xjfzRLQYNhSdmC_aJbxIbv",
-    #     "location": "Austin",
-    #     "description":["adventure" , "music" , "food"]
-    # },
-    # {
-    #     "url": "https://scontent.cdninstagram.com/vp/9fb93cba53ad14819ff20b4044434721/5BF21B8A/t51.2885-15/sh0.08/e35/s640x640/36160470_1036318143194877_7432221918230478848_n.jpg?_nc_eui2=AeFuns6crQY85jwZFDPKqZai8z76-sZPK60lxUaYIpb-XENHpCHB2knRX6uxb7GnN-skGIm_o-ZcMT5tL-IQG4-I",
-    #     "location": "Germany",
-    #     "description":["hills" , "music" , "culture"]
-    # }
-    # ]
+    # instagram_urls = read_instagram_feed(user_id, access_token)
+    # reco_result=build_matrix.run_instagram_model("sid", instagram_urls)
+    # print reco_result
+    result = [{
+        "url": "https://scontent.cdninstagram.com/vp/87c04d0814eb22217015f5d4757c5aeb/5C0D0AF2/t51.2885-15/sh0.08/e35/s640x640/37254209_2119495828322471_6795489576329674752_n.jpg?_nc_eui2=AeGwhmWbrK2upocXw-fitQ_XtU8urjdHJuMnzfaBnVJtH1BjmaHwo-8MG0W6gYuTM0xjfzRLQYNhSdmC_aJbxIbv",
+        "location": "Austin",
+        "description":["adventure" , "music" , "food"]
+    },
+    {
+        "url": "https://scontent.cdninstagram.com/vp/9fb93cba53ad14819ff20b4044434721/5BF21B8A/t51.2885-15/sh0.08/e35/s640x640/36160470_1036318143194877_7432221918230478848_n.jpg?_nc_eui2=AeFuns6crQY85jwZFDPKqZai8z76-sZPK60lxUaYIpb-XENHpCHB2knRX6uxb7GnN-skGIm_o-ZcMT5tL-IQG4-I",
+        "location": "Germany",
+        "description":["hills" , "music" , "culture"]
+    }
+    ]
     push_sid(reco_result)
 
 
