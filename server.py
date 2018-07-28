@@ -102,7 +102,7 @@ def gopis_method(user_id, access_token):
         "description":["hills" , "music" , "culture"]
     }
     ]
-    push_sid(reco_result)
+    push_sid(result)
 
 
 run(host='localhost', port=8080, debug=True)
