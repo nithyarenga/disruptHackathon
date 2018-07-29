@@ -75,6 +75,12 @@ def reco():
         return {"result": 400}
     else:
         user_id=v['user_id']
+    if v.get('group_id') is None:
+        response.status = 400
+        return {"result": 400}
+    else:
+        group_id = v['group_id']
+        print group_id
     file_name = group_id+".pkl"
     if os.path.isfile(file_name): 
         pkl_file = open(file_name, 'rb')
