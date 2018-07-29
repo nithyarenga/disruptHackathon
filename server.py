@@ -152,7 +152,7 @@ def gopis_method(user_id, access_token, group_id):
         old_reco = pickle.load(pkl_file)
         pkl_file.close()
         new_reco.extend(old_reco)
-        unique_reco = {v['location']:v for v in old_reco}.values()
+        unique_reco = {v['location']:v for v in new_reco}.values()
         pkl_file = open(file_name, 'wb')
         pickle.dump(unique_reco, pkl_file)
         pkl_file.close()
