@@ -11,9 +11,6 @@ import cPickle as pickle
 import build_matrix
 import os.path
 
-#ids
-group_id="sid"
-user_id="siddhukrs"
 
 mock_results = [{
         "url": ["https://scontent.cdninstagram.com/vp/87c04d0814eb22217015f5d4757c5aeb/5C0D0AF2/t51.2885-15/sh0.08/e35/s640x640/37254209_2119495828322471_6795489576329674752_n.jpg?_nc_eui2=AeGwhmWbrK2upocXw-fitQ_XtU8urjdHJuMnzfaBnVJtH1BjmaHwo-8MG0W6gYuTM0xjfzRLQYNhSdmC_aJbxIbv" ,"https://scontent.cdninstagram.com/vp/87c04d0814eb22217015f5d4757c5aeb/5C0D0AF2/t51.2885-15/sh0.08/e35/s640x640/37254209_2119495828322471_6795489576329674752_n.jpg?_nc_eui2=AeGwhmWbrK2upocXw-fitQ_XtU8urjdHJuMnzfaBnVJtH1BjmaHwo-8MG0W6gYuTM0xjfzRLQYNhSdmC_aJbxIbv"],
@@ -31,14 +28,14 @@ mock_results = [{
 def hello():
     return "Hello World!"
 
-@post('/images')
-def images():
-        value = request.body.read()
-        v = loads(value)
-        #print v['user_id']
-        #print v['url']
-        response.status = 200
-        return {}
+# @post('/images')
+# def images():
+#         value = request.body.read()
+#         v = loads(value)
+#         #print v['user_id']
+#         #print v['url']
+#         response.status = 200
+#         return {}
 
 @post('/token')
 def token():
@@ -50,11 +47,13 @@ def token():
         return {"result": 400}
     else:
         user_id=v['user_id']
+        print user_id
     if v.get('group_id') is None:
         response.status = 400
         return {"result": 400}
     else:
         group_id = v['group_id']
+        print group_id
     if v.get('access_token') is None:
         response.status = 400
         return {"result": 400}
@@ -68,6 +67,14 @@ def token():
 @post('/reco')
 def reco():
     # result = mock_results
+    value = request.body.read()
+    #print value
+    v = loads(value)
+    if v.get('user_id') is None:
+        response.status = 400
+        return {"result": 400}
+    else:
+        user_id=v['user_id']
     file_name = group_id+".pkl"
     if os.path.isfile(file_name): 
         pkl_file = open(file_name, 'rb')
@@ -75,12 +82,12 @@ def reco():
         pkl_file.close()
     else:
         result = mock_results
-    push_sid(result)
+    push_sid(result, user_id)
     response.status = 200
     return {"result": 200}
     
 
-def push_sid(urls):
+def push_sid(urls, user_id):
     pusher_client = pusher.Pusher(
         app_id='562354',
         key='472deb41d62feac32b9b',
@@ -133,7 +140,7 @@ def gopis_method(user_id, access_token, group_id):
         pkl_file = open(file_name, 'wb')
         pickle.dump(new_reco, pkl_file)
         pkl_file.close()
-        push_sid(new_reco)
+        push_sid(new_reco, user_id)
     else:
         pkl_file = open(file_name, 'rb')
         old_reco = pickle.load(pkl_file)
@@ -143,7 +150,7 @@ def gopis_method(user_id, access_token, group_id):
         pkl_file = open(file_name, 'wb')
         pickle.dump(unique_reco, pkl_file)
         pkl_file.close()
-        push_sid(unique_reco)
+        push_sid(unique_reco, user_id)
 
 
 run(host='localhost', port=8080, debug=True)
