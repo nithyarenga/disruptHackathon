@@ -22,15 +22,15 @@ def hello():
 def images():
         value = request.body.read()
         v = loads(value)
-        print v['user_id']
-        print v['url']
+        #print v['user_id']
+        #print v['url']
         response.status = 200
         return {}
 
 @post('/token')
 def token():
     value = request.body.read()
-    print value
+    #print value
     v = loads(value)
     if v.get('user_id') is None:
         response.status = 400
@@ -54,21 +54,21 @@ def token():
 
 @post('/reco')
 def reco():
-    result = [{
-        "url": "https://scontent.cdninstagram.com/vp/87c04d0814eb22217015f5d4757c5aeb/5C0D0AF2/t51.2885-15/sh0.08/e35/s640x640/37254209_2119495828322471_6795489576329674752_n.jpg?_nc_eui2=AeGwhmWbrK2upocXw-fitQ_XtU8urjdHJuMnzfaBnVJtH1BjmaHwo-8MG0W6gYuTM0xjfzRLQYNhSdmC_aJbxIbv",
-        "location": "Austin",
-        "description":["adventure" , "music" , "food"]
-    },
-    {
-        "url": "https://scontent.cdninstagram.com/vp/9fb93cba53ad14819ff20b4044434721/5BF21B8A/t51.2885-15/sh0.08/e35/s640x640/36160470_1036318143194877_7432221918230478848_n.jpg?_nc_eui2=AeFuns6crQY85jwZFDPKqZai8z76-sZPK60lxUaYIpb-XENHpCHB2knRX6uxb7GnN-skGIm_o-ZcMT5tL-IQG4-I",
-        "location": "Germany",
-        "description":["hills" , "music" , "culture"]
-    }
-    ]
+    # result = [{
+    #     "url": "https://scontent.cdninstagram.com/vp/87c04d0814eb22217015f5d4757c5aeb/5C0D0AF2/t51.2885-15/sh0.08/e35/s640x640/37254209_2119495828322471_6795489576329674752_n.jpg?_nc_eui2=AeGwhmWbrK2upocXw-fitQ_XtU8urjdHJuMnzfaBnVJtH1BjmaHwo-8MG0W6gYuTM0xjfzRLQYNhSdmC_aJbxIbv",
+    #     "location": "Austin",
+    #     "description":["adventure" , "music" , "food"]
+    # },
+    # {
+    #     "url": "https://scontent.cdninstagram.com/vp/9fb93cba53ad14819ff20b4044434721/5BF21B8A/t51.2885-15/sh0.08/e35/s640x640/36160470_1036318143194877_7432221918230478848_n.jpg?_nc_eui2=AeFuns6crQY85jwZFDPKqZai8z76-sZPK60lxUaYIpb-XENHpCHB2knRX6uxb7GnN-skGIm_o-ZcMT5tL-IQG4-I",
+    #     "location": "Germany",
+    #     "description":["hills" , "music" , "culture"]
+    # }
+    # ]
 
-    # pkl_file = open('myfile.pkl', 'rb')
-    # result = pickle.load(pkl_file)
-    # pkl_file.close()
+    pkl_file = open('myfile.pkl', 'rb')
+    result = pickle.load(pkl_file)
+    pkl_file.close()
     
     push_sid(result)
     response.status = 200
@@ -102,30 +102,48 @@ def read_instagram_feed(user_id,access_token):
 
 def gopis_method(user_id, access_token, group_id):
     
-    # pkl_file = open('myfile.pkl', 'rb')
-    # old_reco = pickle.load(pkl_file)
+    pkl_file = open('myfile.pkl', 'rb')
+    old_reco = pickle.load(pkl_file)
+    pkl_file.close()
 
-    # instagram_urls = read_instagram_feed(user_id, access_token)
-    # new_reco=build_matrix.run_instagram_model(group_id, instagram_urls)
-    # print new_reco
-    # old_reco.append(new_reco)
-    # pkl_file = open('myfile.pkl', 'wb')
-    # mydict2 = pickle.dump(pkl_file)
-    # push_sid(mydict2)
+    instagram_urls = read_instagram_feed(user_id, access_token)
+    top_cities, top_cities_images, top_city_concepts=build_matrix.run_instagram_model(group_id, instagram_urls)
+
+    new_reco = []
+    city_list = top_cities.most_common(3)
+    for x in city_list:
+        loc = x[0]
+        new_json = {
+            "location": loc,
+            "url": [top_cities_images[loc][0],top_cities_images[loc][1],top_cities_images[loc][2]],
+            "description": [top_city_concepts[loc][0],top_city_concepts[loc][1],top_city_concepts[loc][2]]
+        }
+        new_reco.append(new_json)
+    #print new_reco
+
+    old_reco.extend(new_reco)
+    #print old_reco
+    unique_reco = {v['location']:v for v in old_reco}.values()
+    pkl_file = open('myfile.pkl', 'wb')
+    pickle.dump(unique_reco, pkl_file)
+    #print unique_reco
+    pkl_file.close()
+
+    push_sid(unique_reco)
 
     
-    result = [{
-        "url": "https://scontent.cdninstagram.com/vp/87c04d0814eb22217015f5d4757c5aeb/5C0D0AF2/t51.2885-15/sh0.08/e35/s640x640/37254209_2119495828322471_6795489576329674752_n.jpg?_nc_eui2=AeGwhmWbrK2upocXw-fitQ_XtU8urjdHJuMnzfaBnVJtH1BjmaHwo-8MG0W6gYuTM0xjfzRLQYNhSdmC_aJbxIbv",
-        "location": "Austin",
-        "description":["adventure" , "music" , "food"]
-    },
-    {
-        "url": "https://scontent.cdninstagram.com/vp/9fb93cba53ad14819ff20b4044434721/5BF21B8A/t51.2885-15/sh0.08/e35/s640x640/36160470_1036318143194877_7432221918230478848_n.jpg?_nc_eui2=AeFuns6crQY85jwZFDPKqZai8z76-sZPK60lxUaYIpb-XENHpCHB2knRX6uxb7GnN-skGIm_o-ZcMT5tL-IQG4-I",
-        "location": "Germany",
-        "description":["hills" , "music" , "culture"]
-    }
-    ]
-    push_sid(result)
+    # result = [{
+    #     "url": "https://scontent.cdninstagram.com/vp/87c04d0814eb22217015f5d4757c5aeb/5C0D0AF2/t51.2885-15/sh0.08/e35/s640x640/37254209_2119495828322471_6795489576329674752_n.jpg?_nc_eui2=AeGwhmWbrK2upocXw-fitQ_XtU8urjdHJuMnzfaBnVJtH1BjmaHwo-8MG0W6gYuTM0xjfzRLQYNhSdmC_aJbxIbv",
+    #     "location": "Austin",
+    #     "description":["adventure" , "music" , "food"]
+    # },
+    # {
+    #     "url": "https://scontent.cdninstagram.com/vp/9fb93cba53ad14819ff20b4044434721/5BF21B8A/t51.2885-15/sh0.08/e35/s640x640/36160470_1036318143194877_7432221918230478848_n.jpg?_nc_eui2=AeFuns6crQY85jwZFDPKqZai8z76-sZPK60lxUaYIpb-XENHpCHB2knRX6uxb7GnN-skGIm_o-ZcMT5tL-IQG4-I",
+    #     "location": "Germany",
+    #     "description":["hills" , "music" , "culture"]
+    # }
+    # ]
+    # push_sid(result)
 
 
 run(host='localhost', port=8080, debug=True)
