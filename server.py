@@ -109,6 +109,11 @@ def gopis_method(user_id, access_token, group_id):
     
     instagram_urls = read_instagram_feed(user_id, access_token)
     top_cities, top_cities_images, top_city_concepts=build_matrix.run_instagram_model(group_id, instagram_urls)
+    # print top_cities
+    # print "\n"
+    # print top_cities_images
+    # print "\n"
+    # print top_city_concepts
 
     new_reco = []
     city_list = top_cities.most_common(4)

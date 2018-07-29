@@ -121,7 +121,7 @@ def top_responses(response_data):
 def find_topconcepts_images(top_group_concepts, all_top_cities):
     flickr_results = pickle.load(open(os.path.join('./cache', 'all_flicker_results.pickle')))
     flickr_fileconv = pickle.load(open(os.path.join('./cache', 'flickr_hash_images.pickle')))
-    top_cities = all_top_cities.most_common(3)
+    top_cities = all_top_cities.most_common(5)
     city_topimages = {}
     top_common_concepts = {}
     for city, counter in top_cities:
