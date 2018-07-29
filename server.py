@@ -11,7 +11,7 @@ import cPickle as pickle
 import build_matrix
 
 #ids
-group_id=""
+group_id="sid"
 user_id="siddhukrs"
 
 @get('/hello')
@@ -32,10 +32,23 @@ def token():
     value = request.body.read()
     print value
     v = loads(value)
-    user_id=v['user_id']
-    group_id = v['group_id']
+    if v.get('user_id') is None:
+        response.status = 400
+        return {"result": 400}
+    else:
+        user_id=v['user_id']
+    if v.get('group_id') is None:
+        response.status = 400
+        return {"result": 400}
+    else:
+        group_id = v['group_id']
+    if v.get('access_token') is None:
+        response.status = 400
+        return {"result": 400}
+    else:
+        access_token = v['access_token']
     response.status = 200
-    thr = threading.Thread(target=gopis_method, args=(v['user_id'],v['access_token']), kwargs={})
+    thr = threading.Thread(target=gopis_method, args=(user_id, access_token, group_id), kwargs={})
     thr.start()
     return {"result": 200}
 
@@ -87,7 +100,7 @@ def read_instagram_feed(user_id,access_token):
     # print responseBody
     return responseBody["urls"]
 
-def gopis_method(user_id, access_token):
+def gopis_method(user_id, access_token, group_id):
     
     # pkl_file = open('myfile.pkl', 'rb')
     # old_reco = pickle.load(pkl_file)
