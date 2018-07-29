@@ -111,7 +111,7 @@ def gopis_method(user_id, access_token, group_id):
     top_cities, top_cities_images, top_city_concepts=build_matrix.run_instagram_model(group_id, instagram_urls)
 
     new_reco = []
-    city_list = top_cities.most_common(3)
+    city_list = top_cities.most_common(4)
     for x in city_list:
         loc = x[0]
         new_json = {
