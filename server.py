@@ -9,6 +9,7 @@ import threading
 import time
 import cPickle as pickle
 import build_matrix
+import os.path
 
 #ids
 group_id="sid"
@@ -67,11 +68,13 @@ def token():
 @post('/reco')
 def reco():
     # result = mock_results
-
-    pkl_file = open('myfile.pkl', 'rb')
-    result = pickle.load(pkl_file)
-    pkl_file.close()
-    
+    file_name = group_id+".pkl"
+    if os.path.isfile(file_name): 
+        pkl_file = open(file_name, 'rb')
+        result = pickle.load(pkl_file)
+        pkl_file.close()
+    else:
+        result = mock_results
     push_sid(result)
     response.status = 200
     return {"result": 200}
@@ -104,10 +107,6 @@ def read_instagram_feed(user_id,access_token):
 
 def gopis_method(user_id, access_token, group_id):
     
-    pkl_file = open('myfile.pkl', 'rb')
-    old_reco = pickle.load(pkl_file)
-    pkl_file.close()
-
     instagram_urls = read_instagram_feed(user_id, access_token)
     top_cities, top_cities_images, top_city_concepts=build_matrix.run_instagram_model(group_id, instagram_urls)
 
@@ -121,21 +120,25 @@ def gopis_method(user_id, access_token, group_id):
             "description": [top_city_concepts[loc][0],top_city_concepts[loc][1],top_city_concepts[loc][2]]
         }
         new_reco.append(new_json)
-    #print new_reco
 
-    old_reco.extend(new_reco)
-    #print old_reco
-    unique_reco = {v['location']:v for v in old_reco}.values()
-    pkl_file = open('myfile.pkl', 'wb')
-    pickle.dump(unique_reco, pkl_file)
-    #print unique_reco
-    pkl_file.close()
-
-    push_sid(unique_reco)
-
-    
-    # result = mock_results
-    # push_sid(result)
+    file_name = group_id+".pkl"
+    if not os.path.isfile(file_name): 
+        file = open(file_name, 'w+')
+        file.close()
+        pkl_file = open(file_name, 'wb')
+        pickle.dump(new_reco, pkl_file)
+        pkl_file.close()
+        push_sid(new_reco)
+    else:
+        pkl_file = open(file_name, 'rb')
+        old_reco = pickle.load(pkl_file)
+        pkl_file.close()
+        new_reco.extend(old_reco)
+        unique_reco = {v['location']:v for v in old_reco}.values()
+        pkl_file = open(file_name, 'wb')
+        pickle.dump(unique_reco, pkl_file)
+        pkl_file.close()
+        push_sid(unique_reco)
 
 
 run(host='localhost', port=8080, debug=True)
