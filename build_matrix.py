@@ -146,6 +146,12 @@ def run_instagram_model(group_id, image_urls):
         group_images = pickle.load(open(group_image_picklefilename))
     else:
         group_images = {}
+    try:
+        current_grp_images = group_images[group_id]
+    except KeyError:
+        current_grp_images = []
+    all_img_urls = current_grp_images.extend(image_urls)
+    instagram_results = rest_calls.instagram_image_analysis(group_id, all_img_urls)
     instagram_results = rest_calls.instagram_image_analysis(group_id, image_urls)
     instagram_scores, instagram_tags = curate_imagescores(instagram_results)
     top_group_concepts = identify_toptrends(instagram_scores)
@@ -158,8 +164,8 @@ def run_instagram_model(group_id, image_urls):
     test_matrix, dummy_outcome, dummy_location = build_all_rows(instagram_scores, reqd_tags)
     results = reqd_model.predict(test_matrix)
     #results_proba = reqd_model.predict_proba(test_matrix)
-    group_images.setdefault(group_id, []).extend(image_urls)
-    group_images[group_id] = list(set(image_urls))
+    #group_images.setdefault(group_id, []).extend(image_urls)
+    group_images[group_id] = list(set(all_img_urls))
     pickle.dump(group_images, open(group_image_picklefilename, 'w+'))
     top_cities = collections.Counter([location_dict[i] for i in results])
     top_cities_images, top_city_concepts = find_topconcepts_images(top_group_concepts, top_cities)
