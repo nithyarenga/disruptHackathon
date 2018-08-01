@@ -152,7 +152,7 @@ def run_instagram_model(group_id, image_urls):
         current_grp_images = []
     all_img_urls = current_grp_images.extend(image_urls)
     instagram_results = rest_calls.instagram_image_analysis(group_id, all_img_urls)
-    instagram_results = rest_calls.instagram_image_analysis(group_id, image_urls)
+    #instagram_results = rest_calls.instagram_image_analysis(group_id, image_urls)
     instagram_scores, instagram_tags = curate_imagescores(instagram_results)
     top_group_concepts = identify_toptrends(instagram_scores)
     # Loading Flickr Data

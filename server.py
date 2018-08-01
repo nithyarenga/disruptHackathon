@@ -94,13 +94,7 @@ def reco():
     
 
 def push_sid(urls, user_id):
-    pusher_client = pusher.Pusher(
-        app_id='562354',
-        key='472deb41d62feac32b9b',
-        secret='d804a3b8190eb2145459',
-        cluster='us2',
-        ssl=True
-    )
+    #Pusher credentials to setup pusher_client
     for url in urls:
         pusher_client.trigger(user_id,'prependEntryEvent',url)
 
